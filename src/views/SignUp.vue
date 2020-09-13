@@ -1,7 +1,10 @@
 <template>
   <v-container class="col-8">
+    <HEADER></HEADER>
     <v-card>
-      <v-card-title>Регистрация</v-card-title>
+      <v-card-title>
+        Регистрация
+      </v-card-title>
       <v-card-text>
         <v-text-field outlined placeholder="Имя пользователя" type="text" v-model="username"></v-text-field>
         <v-text-field outlined placeholder="Почта" v-model="email" type="mail"></v-text-field>
@@ -19,9 +22,12 @@
 
 <script>
 import { AXIOS } from "../main";
-
+import HEADER from "./header.vue";
+const qs = require("querystring");
 export default {
-  name: "SignUp",
+  name: "SignUp",components: {
+    HEADER,
+  },
   data: () => ({
     username: "",
     email: "",
@@ -40,18 +46,11 @@ export default {
           console.log(response.data);
           AXIOS.interceptors.request.use(function (config) {
             const token = response.data.value;
-            config.headers.Authorization = "Bearer " + token;
+            config.headers.AuthorFization = "Bearer " + token;
             return config;
           });
-          self.$store
-            .dispatch("login", {
-              token: response.data.value,
-              id: response.data.customerId,
-              email: response.data.email,
-            })
-            .then(() => {
-              self.$router.push("/foods");
-            });
+
+          self.$router.push("/");
         })
         .catch((err) => {
           console.log(err);

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <HEADER></HEADER>
-    <v-file-input label="File input" filled prepend-icon="mdi-camera" v-model="files"></v-file-input>
+    <v-file-input label="File input" filled prepend-icon="mdi-camera" v-model="files" multiple></v-file-input>
     <v-btn @click="sendFiles">
       <v-icon>mdi-send</v-icon>
     </v-btn>
@@ -38,7 +38,16 @@ export default {
     sendFiles() {
       console.log(this.files);
       console.log(AXIOS);
-      AXIOS.post("/files", { files: this.files }).then(function (response) {
+
+      var options = {
+        Authorization: this.$store.getters.getToken,
+        "Content-Type": "multipart/form-data",
+      };
+      let formData = new FormData();
+      for (let i = 0; i < this.files.length; i++) {
+        formData.append("file" + i, this.files[i]);
+      }
+      AXIOS.post("/image", formData, options).then(function (response) {
         var issue = response.data.info;
         files = response.data.image;
         if (issue.includes(0)) {

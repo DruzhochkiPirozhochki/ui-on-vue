@@ -1,5 +1,6 @@
 <template>
   <v-container class="col-8">
+    <HEADER></HEADER>
     <v-card>
       <v-card-title>Вход</v-card-title>
       <v-card-text>
@@ -26,9 +27,12 @@
 </style>
 <script>
 import { AXIOS } from "../main";
-
+import HEADER from "./header.vue";
 export default {
   name: "SignIn",
+  components: {
+    HEADER,
+  },
   data: () => ({
     username: "",
     password: "",
@@ -36,21 +40,28 @@ export default {
   methods: {
     signIn() {
       let self = this;
-      AXIOS.post("/signIn", {
-        username: self.username,
-        password: self.password,
-      })
+      const options = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      };
+      AXIOS.post(
+        "/signIn",
+        { username: this.username, password: this.password },
+        options
+      )
         .then((response) => {
           console.log(response.data);
           AXIOS.interceptors.request.use(function (config) {
-            const token = response.data.value;
-            config.headers.Authorization = "Bearer " + token;
+            const token = response.data.token;
+            config.headers.Authorization = token;
 
             return config;
           });
           self.$store
             .dispatch("signIn", {
-              token: response.data.value.token,
+              token: response.data.token,
               id: response.data.id,
               username: response.data.username,
             })
