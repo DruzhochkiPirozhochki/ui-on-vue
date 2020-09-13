@@ -1,10 +1,24 @@
 <template>
   <v-container>
-    <HEADER></HEADER>
-    <v-file-input label="File input" filled prepend-icon="mdi-camera" v-model="files" multiple></v-file-input>
-    <v-btn @click="sendFiles">
-      <v-icon>mdi-send</v-icon>
-    </v-btn>
+    <v-file-input
+      label="File input"
+      filled
+      prepend-icon="mdi-camera"
+      v-model="files"
+      multiple
+      placeholder="Внесите все файлы которые надо проверить"
+      @change="handleFileUpload()"
+      small-chips
+      counter
+      show-size
+      accept="image/png, image/jpeg, image/jpg, image/bmp"
+    ></v-file-input>
+    <v-card-actions class="justify-center">
+      <v-btn @click="sendFiles">
+        <v-icon>mdi-send</v-icon>
+      </v-btn>
+    </v-card-actions>
+    <v-divider></v-divider>
     <v-row>
       <v-col v-for="file in files" :key="file.index" class="xs-2">
         <div>
@@ -22,13 +36,9 @@
 
 <script>
 import { AXIOS } from "../main";
-import HEADER from "./header.vue";
 
 export default {
   name: "InputImage",
-  components: {
-    HEADER,
-  },
   data: () => ({
     files: [],
     issues: [],
@@ -37,33 +47,27 @@ export default {
   methods: {
     sendFiles() {
       console.log(this.files);
-      console.log(AXIOS);
-
       var options = {
-        Authorization: this.$store.getters.getToken,
-        "Content-Type": "multipart/form-data",
+        headers: {
+          Authorization: this.$store.getters.getToken,
+          "Content-Type": "multipart/form-data",
+        },
       };
       let formData = new FormData();
-      for (let i = 0; i < this.files.length; i++) {
-        formData.append("file" + i, this.files[i]);
+      for (var i = 0; i < this.files.length; i++) {
+        let file = this.files[i];
+        formData.append("files", file);
       }
-      AXIOS.post("/image", formData, options).then(function (response) {
-        var issue = response.data.info;
-        files = response.data.image;
-        if (issue.includes(0)) {
-          issues.push("issue1");
-        }
-        if (issue.includes(1)) {
-          issues.push("issue1");
-        }
-        if (issue.includes(2)) {
-          issues.push("issue2");
-        }
-      });
+
+      console.log(formData);
+      AXIOS.post("/image", formData, options).catch((err) =>
+        console.error(err)
+      );
     },
     getUrl(file) {
       return URL.createObjectURL(file);
     },
+    handleFileUpload() {},
   },
 };
 </script>

@@ -1,7 +1,6 @@
 <template>
-  <v-container class="col-8">
-    <HEADER></HEADER>
-    <v-card>
+  <v-container>
+    <v-card class="col-8">
       <v-card-title>Вход</v-card-title>
       <v-card-text>
         <v-text-field outlined placeholder="Имя пользователя" type="mail" v-model="username"></v-text-field>
@@ -27,12 +26,9 @@
 </style>
 <script>
 import { AXIOS } from "../main";
-import HEADER from "./header.vue";
+
 export default {
   name: "SignIn",
-  components: {
-    HEADER,
-  },
   data: () => ({
     username: "",
     password: "",
@@ -44,7 +40,6 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
       };
       AXIOS.post(
         "/signIn",
@@ -62,7 +57,7 @@ export default {
           self.$store
             .dispatch("signIn", {
               token: response.data.token,
-              id: response.data.id,
+              id: response.data.userId,
               username: response.data.username,
             })
             .then(() => {
